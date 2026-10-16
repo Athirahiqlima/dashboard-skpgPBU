@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SKPG@PBU – Sistem Kajian Pengesanan Graduan</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ========== NAVBAR ========== -->
+<nav class="navbar" id="navbar">
+  <div class="nav-brand">
+    <div class="brand-logo">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+        <rect width="36" height="36" rx="8" fill="#C9A84C"/>
+        <text x="18" y="25" text-anchor="middle" font-size="16" font-weight="bold" fill="#1B2A4A" font-family="Arial">S</text>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <span class="brand-title">SKPG@PBU</span>
+      <span class="brand-sub">Kajian Pengesanan Graduan</span>
+    </div>
+  </div>
+  <button class="nav-toggle" id="navToggle" aria-label="Togol navigasi">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-links" id="navLinks">
+    <!-- Pautan awam -->
+    <div class="nav-group public-nav">
+      <a href="#" class="nav-link active" data-page="home">Utama</a>
+      <a href="#" class="nav-link" data-page="public-stats">Statistik</a>
+      <a href="#" class="nav-link" data-page="contact">Hubungi</a>
+    </div>
+    <!-- Butang akses modul -->
+    <div class="nav-actions">
+      <button class="btn btn-outline-gold" id="btnStaffLogin" onclick="showPage('staff-login')">Log Masuk Staf</button>
+      <div class="dropdown">
+        <button class="btn btn-outline-gold" id="btnPortalAccess">Akses Portal ▾</button>
+        <div class="dropdown-menu" id="portalDropdown">
+          <a href="#" onclick="showPage('graduate-portal')">Portal Graduan</a>
+          <a href="#" onclick="showPage('advisor-login')">Penasihat Akademik</a>
+        </div>
+      </div>
+    </div>
+    <!-- Maklumat pengguna (papar selepas log masuk) -->
+    <div class="nav-user" id="navUser" style="display:none">
+      <span class="user-badge" id="userBadge"></span>
+      <button class="btn btn-sm btn-danger" onclick="logout()">Log Keluar</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ========== BEKAS HALAMAN ========== -->
+<main id="appMain">
+
+  <!-- ===== AWAM: UTAMA ===== -->
+  <section class="page active" id="page-home">
+    <div class="hero">
+      <div class="hero-content">
+        <div class="hero-badge">Platform Rasmi Pengesanan Graduan</div>
+        <h1 class="hero-title">Kajian Pengesanan Graduan</h1>
+        <p class="hero-subtitle">SKPG@PBU — Politeknik Balik Pulau</p>
+        <p class="hero-desc">Memantau kebolehpasaran graduan, laluan kerjaya, dan hasil akademik bagi meningkatkan kualiti pendidikan serta kecemerlangan institusi.</p>
+      </div>
+    </div>
+
+    <!-- Kad modul -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Modul Sistem</h2>
+        <p>Akses modul yang sesuai dengan peranan anda</p>
+      </div>
+      <div class="cards-grid two-col-grid">
+        <div class="card feature-card" onclick="showPage('public-stats')">
+          <div class="fc-icon navy">📈</div>
+          <h3>Statistik Awam</h3>
+          <p>Lihat data kebolehpasaran graduan 5 tahun yang lalu.</p>
+        </div>
+        <div class="card feature-card" onclick="showPage('graduate-portal')">
+          <div class="fc-icon gold">🎓</div>
+          <h3>Portal Graduan</h3>
+          <p>Akses dokumen soal selidik dan semak status penyiapan anda.</p>
+        </div>
+        <div class="card feature-card" onclick="showPage('advisor-login')">
+          <div class="fc-icon navy">👨‍🏫</div>
+          <h3>Penasihat Akademik</h3>
+          <p>Cari dan pantau status soal selidik pelajar di bawah seliaan anda.</p>
+        </div>
+        <div class="card feature-card" onclick="showPage('staff-login')">
+          <div class="fc-icon dark">🔒</div>
+          <h3>Papan Pemuka Staf</h3>
+          <p>Akses staf yang dibenarkan untuk pengurusan data dan analitik.</p>
+        </div>
+      </div>
+    </div>
+
+
+  </section>
+
+  <!-- ===== AWAM: STATISTIK LIMA TAHUN ===== -->
+  <section class="page" id="page-public-stats">
+    <div class="page-header">
+      <div class="container">
+        <h1>Statistik Kebolehpasaran Graduan</h1>
+        <p id="publicStatsSubtitle">Trend dan Prestasi Graduan SKPG@PBU bagi Tempoh Lima Tahun Terkini</p>
+      </div>
+    </div>
+    <div class="container">
+      <!-- Kad ringkasan -->
+      <div class="cards-grid four-col mb-2">
+        <div class="stat-card">
+          <div class="sc-icon">🎓</div>
+          <div class="sc-num" id="scTotalGrads">—</div>
+          <div class="sc-lbl" id="scTotalGradsLbl">Jumlah Graduan</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-icon">💼</div>
+          <div class="sc-num" id="scEmployRate">—</div>
+          <div class="sc-lbl" id="scEmployRateLbl">Kadar Kebolehpasaran</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-icon">📊</div>
+          <div class="sc-num" id="scResponseRate">—</div>
+          <div class="sc-lbl" id="scResponseRateLbl">Kadar Respons</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-icon">🎯</div>
+          <div class="sc-num" id="scInField">—</div>
+          <div class="sc-lbl" id="scInFieldLbl">Bekerja Dalam Bidang</div>
+        </div>
+      </div>
+
+      <!-- Carta -->
+      <div class="card mb-2">
+        <div class="card-header">
+          <h3 id="publicChartTitle">Trend Kadar Kebolehpasaran</h3>
+        </div>
+        <div class="chart-area">
+          <div id="publicLineChart"></div>
+        </div>
+      </div>
+
+      <!-- Jadual sejarah -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Jadual Data Sejarah</h3>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table" id="publicStatsTable">
+            <thead>
+              <tr>
+                <th>Tahun</th>
+                <th>Jumlah Graduan</th>
+                <th>Responden Soal Selidik</th>
+                <th>Kadar Respons</th>
+                <th>Kadar Kebolehpasaran</th>
+                <th>Bekerja Dalam Bidang</th>
+              </tr>
+            </thead>
+            <tbody id="publicStatsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== AWAM: HUBUNGI ===== -->
+  <section class="page" id="page-contact">
+    <div class="page-header">
+      <div class="container">
+        <h1>Hubungi SKPG@PBU</h1>
+        <p>Hubungi pasukan Kajian Pengesanan Graduan</p>
+      </div>
+    </div>
+    <div class="container">
+      <div class="two-col-grid">
+        <div>
+          <div class="card mb-2">
+            <h3 class="card-title">Hantar Mesej</h3>
+            <form id="contactForm" class="form" onsubmit="submitContact(event)">
+              <div class="form-group">
+                <label>Nama Penuh *</label>
+                <input type="text" class="form-control" placeholder="Nama penuh anda" required />
+              </div>
+              <div class="form-group">
+                <label>Alamat E-mel *</label>
+                <input type="email" class="form-control" placeholder="emel@contoh.com" required />
+              </div>
+              <div class="form-group">
+                <label>Kategori</label>
+                <select class="form-control">
+                  <option>Pertanyaan Umum</option>
+                  <option>Bantuan Soal Selidik</option>
+                  <option>Sokongan Teknikal</option>
+                  <option>Permohonan Data</option>
+                  <option>Lain-lain</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Mesej *</label>
+                <textarea class="form-control" rows="5" placeholder="Huraikan pertanyaan anda..." required></textarea>
+              </div>
+              <button type="submit" class="btn btn-navy btn-full">Hantar Mesej</button>
+            </form>
+          </div>
+        </div>
+        <div>
+          <div class="card mb-2">
+            <h3 class="card-title">Maklumat Hubungan</h3>
+            <div class="contact-info-list">
+              <div class="ci-item">
+                <span class="ci-icon">🏛️</span>
+                <div>
+                  <strong>Politeknik Balik Pulau</strong>
+                  <p>Pinang Nirai, 11000 Balik Pulau, Pulau Pinang</p>
+                </div>
+              </div>
+              <div class="ci-item">
+                <span class="ci-icon">📧</span>
+                <div>
+                  <strong>E-mel</strong>
+                  <p>skpgPBU@gmail.com</p>
+                </div>
+              </div>
+              <div class="ci-item">
+                <span class="ci-icon">📞</span>
+                <div>
+                  <strong>Telefon</strong>
+                  <p>0136720043</p>
+                </div>
+              </div>
+              <div class="ci-item">
+                <span class="ci-icon">🕐</span>
+                <div>
+                  <strong>Waktu Pejabat</strong>
+                  <p>Isnin – Jumaat: 8:00 PG – 4:30 PTG</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <h3 class="card-title">Pautan Pantas</h3>
+            <ul class="quick-links">
+              <li><a href="#" onclick="showPage('graduate-portal')">📋 Portal Soal Selidik Graduan</a></li>
+              <li><a href="#" onclick="showPage('public-stats')">📊 Statistik Awam</a></li>
+              <li><a href="#" onclick="showPage('staff-login')">🔒 Log Masuk Staf</a></li>
+              <li><a href="#">📄 Garis Panduan Soal Selidik MQA</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== STAF: LOG MASUK ===== -->
+  <section class="page" id="page-staff-login">
+    <div class="auth-wrapper">
+      <div class="auth-card">
+        <div class="auth-header">
+          <div class="auth-logo">🔒</div>
+          <h2>Log Masuk Staf</h2>
+          <p>Kakitangan yang diberi kuasa sahaja</p>
+        </div>
+        <div class="alert alert-info">
+          <strong>Kelayakan Demo:</strong><br/>
+          Admin: <code>admin</code> / <code>admin123</code><br/>
+          Staf: <code>staff</code> / <code>staff123</code>
+        </div>
+        <form class="form" onsubmit="staffLogin(event)">
+          <div class="form-group">
+            <label>ID Staf / Nama Pengguna</label>
+            <input type="text" id="staffUsername" class="form-control" placeholder="Masukkan nama pengguna" required />
+          </div>
+          <div class="form-group">
+            <label>Kata Laluan</label>
+            <input type="password" id="staffPassword" class="form-control" placeholder="Masukkan kata laluan" required />
+          </div>
+          <div id="staffLoginError" class="alert alert-danger" style="display:none">Kelayakan tidak sah. Sila cuba lagi.</div>
+          <button type="submit" class="btn btn-navy btn-full">Log Masuk ke Papan Pemuka Staf</button>
+        </form>
+        <div class="auth-footer">
+          <a href="#" onclick="showPage('home')">← Kembali ke Utama</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== STAF: PAPAN PEMUKA ===== -->
+  <section class="page" id="page-staff-dashboard">
+    <div class="dashboard-layout">
+      <!-- Bar sisi -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <span class="sidebar-title">Panel Staf</span>
+          <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="#" class="sn-link active" onclick="showStaffTab('current-dashboard', this)">
+            <span class="sn-icon">📊</span><span class="sn-text">Papan Pemuka Semasa</span>
+          </a>
+          <a href="#" class="sn-link" onclick="showStaffTab('staff-stats', this)">
+            <span class="sn-icon">📈</span><span class="sn-text">Statistik 5 Tahun</span>
+          </a>
+          <a href="#" class="sn-link" onclick="showStaffTab('data-management', this)">
+            <span class="sn-icon">🗃️</span><span class="sn-text">Pengurusan Data</span>
+          </a>
+          <a href="#" class="sn-link" onclick="showStaffTab('upload-stats', this)">
+            <span class="sn-icon">📤</span><span class="sn-text">Upload Statistik</span>
+          </a>
+        </nav>
+        <div class="sidebar-user">
+          <div class="su-avatar">👤</div>
+          <div class="su-info">
+            <strong id="sidebarUserName">Pengguna Staf</strong>
+            <span id="sidebarUserRole">Staf</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Kandungan utama -->
+      <div class="dashboard-main">
+        <!-- Tab Papan Pemuka Tahun Semasa -->
+        <div class="staff-tab active" id="tab-current-dashboard">
+          <div class="dash-header">
+            <h2 id="dashYearHeading">Papan Pemuka Tahun Semasa — 2024</h2>
+            <div class="dash-actions">
+              <select class="form-control sm" id="dashYearSelect" onchange="updateDashYear()">
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+              </select>
+              <button class="btn btn-gold btn-sm" onclick="exportReport()">⬇ Eksport Laporan</button>
+            </div>
+          </div>
+
+          <!-- Kad KPI -->
+          <div class="cards-grid three-col mb-2">
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-icon">💼</span>
+                <span class="kpi-trend up">+2.1%</span>
+              </div>
+              <div class="kpi-num" id="kpiEmploy">94.2%</div>
+              <div class="kpi-lbl">Kadar Kebolehpasaran Graduan</div>
+              <div class="circular-prog" data-val="94">
+                <svg viewBox="0 0 80 80" width="70" height="70">
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="#e5e7eb" stroke-width="7"/>
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="#1B2A4A" stroke-width="7"
+                    stroke-dasharray="201" stroke-dashoffset="12" stroke-linecap="round" transform="rotate(-90 40 40)" id="cpEmploy"/>
+                </svg>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-icon">📋</span>
+                <span class="kpi-trend up">+5.3%</span>
+              </div>
+              <div class="kpi-num" id="kpiResponse">81.7%</div>
+              <div class="kpi-lbl">Kadar Respons Soal Selidik</div>
+              <div class="circular-prog">
+                <svg viewBox="0 0 80 80" width="70" height="70">
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="#e5e7eb" stroke-width="7"/>
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="#C9A84C" stroke-width="7"
+                    stroke-dasharray="201" stroke-dashoffset="37" stroke-linecap="round" transform="rotate(-90 40 40)" id="cpResponse"/>
+                </svg>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-icon">🎯</span>
+                <span class="kpi-trend up">+1.8%</span>
+              </div>
+              <div class="kpi-num" id="kpiField">73.5%</div>
+              <div class="kpi-lbl">Bekerja Dalam Bidang Pengajian</div>
+              <div class="circular-prog">
+                <svg viewBox="0 0 80 80" width="70" height="70">
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="#e5e7eb" stroke-width="7"/>
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="#1B2A4A" stroke-width="7"
+                    stroke-dasharray="201" stroke-dashoffset="53" stroke-linecap="round" transform="rotate(-90 40 40)" id="cpField"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Statistik sekunder -->
+          <div class="cards-grid four-col mb-2">
+            <div class="mini-stat">
+              <span class="ms-icon">👥</span>
+              <div>
+                <span class="ms-num" id="msGrads">1,247</span>
+                <span class="ms-lbl">Jumlah Graduan</span>
+              </div>
+            </div>
+            <div class="mini-stat">
+              <span class="ms-icon">✅</span>
+              <div>
+                <span class="ms-num" id="msSurveyed">1,019</span>
+                <span class="ms-lbl">Telah Disoal Selidik</span>
+              </div>
+            </div>
+            <div class="mini-stat">
+              <span class="ms-icon">⏳</span>
+              <div>
+                <span class="ms-num" id="msPending">228</span>
+                <span class="ms-lbl">Belum Selesai</span>
+              </div>
+            </div>
+            <div class="mini-stat">
+              <span class="ms-icon">💼</span>
+              <div>
+                <span class="ms-num" id="msEmployed">959</span>
+                <span class="ms-lbl">Bekerja</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Aktiviti terkini -->
+          <div class="card">
+            <div class="card-header">
+              <h3>Penyerahan Soal Selidik Terkini</h3>
+              <button class="btn btn-sm btn-outline-navy" onclick="showStaffTab('data-management', document.querySelector(\'.sn-link:nth-child(3)\'))">Lihat Semua</button>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID Graduan</th>
+                    <th>Nama</th>
+                    <th>Program</th>
+                    <th>Status</th>
+                    <th>Pekerjaan</th>
+                    <th>Tarikh Serah</th>
+                  </tr>
+                </thead>
+                <tbody id="recentSubmissions"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Statistik Lima Tahun -->
+        <div class="staff-tab" id="tab-staff-stats">
+          <div class="dash-header">
+            <h2>Statistik Sejarah</h2>
+            <button class="btn btn-gold btn-sm" onclick="exportReport()">⬇ Eksport</button>
+          </div>
+          <div class="card mb-2">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Tahun</th>
+                    <th>Jumlah Graduan</th>
+                    <th>Respons Soal Selidik</th>
+                    <th>Kadar Respons</th>
+                    <th>Kadar Kebolehpasaran</th>
+                    <th>% Dalam Bidang</th>
+                  </tr>
+                </thead>
+                <tbody id="staffStatsBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Carta Trend</h3></div>
+            <div class="chart-area">
+              <div class="bar-chart" id="staffBarChart"></div>
+              <div class="chart-legend">
+                <span class="legend-dot navy"></span> Kadar Kebolehpasaran &nbsp;
+                <span class="legend-dot gold"></span> Kadar Respons &nbsp;
+                <span class="legend-dot green"></span> % Dalam Bidang
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Pengurusan Data -->
+        <div class="staff-tab" id="tab-data-management">
+          <div class="dash-header">
+            <h2>Pengurusan Data</h2>
+          </div>
+
+          <!-- Notis admin sahaja -->
+          <div id="adminOnlyNotice" class="alert alert-warning" style="display:none">
+            ⚠️ Sesetengah ciri di bawah memerlukan keistimewaan <strong>Pentadbir</strong>. Akaun anda hanya mempunyai akses baca sahaja.
+          </div>
+
+          <!-- Muat naik / Import -->
+          <div class="card mb-2" id="uploadSection">
+            <h3 class="card-title">Import Data Graduan</h3>
+            <div class="import-tabs">
+              <button class="import-tab active" onclick="switchImportTab('excel', this)">📁 Muat Naik Excel</button>
+              <button class="import-tab" onclick="switchImportTab('gsheets', this)">🔗 Google Sheets</button>
+            </div>
+            <div class="import-panel active" id="import-excel">
+              <div class="upload-zone" id="uploadZone" ondragover="event.preventDefault()" ondrop="handleFileDrop(event)">
+                <div class="upload-icon">📂</div>
+                <p><strong>Seret &amp; lepas fail Excel di sini</strong><br/>atau klik untuk layar</p>
+                <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleFileSelect(event)"/>
+                <button class="btn btn-outline-navy" onclick="document.getElementById('fileInput').click()">Layar Fail</button>
+                <p class="text-muted small">Sokong .xlsx, .xls, .csv | Maks 10MB</p>
+              </div>
+              <div id="filePreview" style="display:none" class="file-preview">
+                <div class="fp-info">
+                  <span class="fp-icon">📄</span>
+                  <div>
+                    <strong id="fpName"></strong>
+                    <span id="fpSize"></span>
+                  </div>
+                </div>
+                <div class="fp-actions">
+                  <button class="btn btn-navy btn-sm" onclick="processUpload()">Proses &amp; Import</button>
+                  <button class="btn btn-outline-navy btn-sm" onclick="clearFile()">Buang</button>
+                </div>
+              </div>
+            </div>
+            <div class="import-panel" id="import-gsheets">
+              <form class="form" onsubmit="connectGSheets(event)">
+                <div class="form-group">
+                  <label>URL Google Sheets</label>
+                  <input type="url" class="form-control" id="gsheetsUrl" placeholder="https://docs.google.com/spreadsheets/d/..."/>
+                </div>
+                <div class="form-group">
+                  <label>Nama Helaian / Tab</label>
+                  <input type="text" class="form-control" id="gsheetsTab" placeholder="Sheet1"/>
+                </div>
+                <div class="form-row">
+                  <button type="submit" class="btn btn-navy">Sambung &amp; Import</button>
+                  <button type="button" class="btn btn-outline-navy" onclick="showAlert('Templat dimuat turun (demo).','success')">Muat Turun Templat</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Jadual rekod -->
+          <div class="card">
+            <div class="card-header">
+              <h3>Rekod Graduan</h3>
+              <div class="table-actions">
+                <select class="form-control sm" id="filterYear" onchange="filterRecords()">
+                  <option value="">Semua Tahun</option>
+                  <option value="2024">2024</option>
+                  <option value="2023">2023</option>
+                  <option value="2022">2022</option>
+                  <option value="2021">2021</option>
+                  <option value="2020">2020</option>
+                </select>
+                <select class="form-control sm" id="filterStatus" onchange="filterRecords()">
+                  <option value="">Semua Status</option>
+                  <option value="Bekerja">Bekerja</option>
+                  <option value="Tidak Bekerja">Tidak Bekerja</option>
+                  <option value="Melanjutkan Pelajaran">Melanjutkan Pelajaran</option>
+                </select>
+                <input type="text" class="form-control sm" id="searchRecords" placeholder="Cari nama/ID..." oninput="filterRecords()"/>
+                <button class="btn btn-gold btn-sm" onclick="exportReport()">⬇ Eksport CSV</button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table" id="recordsTable">
+                <thead>
+                  <tr>
+                    <th><input type="checkbox" onchange="toggleSelectAll(this)" /></th>
+                    <th>ID</th>
+                    <th>Nama</th>
+                    <th>Program</th>
+                    <th>Tahun</th>
+                    <th>Status Soal Selidik</th>
+                    <th>Status Pekerjaan</th>
+                    <th>Dalam Bidang</th>
+                    <th>Tindakan</th>
+                  </tr>
+                </thead>
+                <tbody id="recordsBody"></tbody>
+              </table>
+            </div>
+            <div class="table-footer">
+              <span id="recordsCount">Menunjukkan 0 rekod</span>
+              <div class="pagination" id="pagination"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Upload Statistik -->
+        <div class="staff-tab" id="tab-upload-stats">
+          <div class="dash-header">
+            <h2>Upload Data Statistik Tahunan</h2>
+          </div>
+
+          <div class="stats-upload-grid">
+            <!-- Kaedah 1: Upload CSV -->
+            <div class="card">
+              <h3 class="card-title">📁 Upload Fail CSV</h3>
+              <p class="text-muted" style="margin-bottom:1rem;">Muat naik fail CSV dengan format yang ditetapkan untuk mengemas kini data statistik tahunan.</p>
+
+              <div class="upload-zone" id="statsUploadZone" ondragover="event.preventDefault()" ondrop="handleStatsFileDrop(event)">
+                <div class="upload-icon">📊</div>
+                <p><strong>Seret &amp; lepas fail CSV di sini</strong><br/>atau klik untuk layar</p>
+                <input type="file" id="statsFileInput" accept=".csv" style="display:none" onchange="handleStatsFileSelect(event)"/>
+                <button class="btn btn-outline-navy" onclick="document.getElementById('statsFileInput').click()">Layar Fail CSV</button>
+                <p class="text-muted small">Hanya .csv | Format: tahun, jumlahGraduan, responden, kadarRespons, kadarKebolehpasaran, dalamBidang</p>
+              </div>
+
+              <div id="statsFilePreview" style="display:none" class="file-preview">
+                <div class="fp-info">
+                  <span class="fp-icon">📄</span>
+                  <div>
+                    <strong id="statsFpName"></strong>
+                    <span id="statsFpSize"></span>
+                  </div>
+                </div>
+                <div class="fp-actions">
+                  <button class="btn btn-navy btn-sm" onclick="processStatsUpload()">Proses &amp; Import</button>
+                  <button class="btn btn-outline-navy btn-sm" onclick="clearStatsFile()">Buang</button>
+                </div>
+              </div>
+
+              <div class="alert alert-info" style="margin-top:1rem;">
+                <strong>Format CSV yang diperlukan:</strong><br/>
+                Baris pertama mestilah pengepala. Contoh:<br/>
+                <code>tahun,jumlahGraduan,responden,kadarRespons,kadarKebolehpasaran,dalamBidang</code><br/>
+                <code>2025,1300,1066,82.0,95.1,74.2</code>
+                <br/><br/>
+                <button class="btn btn-sm btn-outline-navy" onclick="downloadStatsTemplate()">⬇ Muat Turun Templat CSV</button>
+              </div>
+            </div>
+
+            <!-- Kaedah 2: Input Manual -->
+            <div class="card">
+              <h3 class="card-title">✏️ Input Manual</h3>
+              <p class="text-muted" style="margin-bottom:1rem;">Tambah atau kemas kini data bagi satu tahun secara manual.</p>
+              <form class="form" id="statsManualForm" onsubmit="submitManualStats(event)">
+                <div class="form-row two-col">
+                  <div class="form-group">
+                    <label>Tahun *</label>
+                    <input type="number" id="smYear" class="form-control" placeholder="cth. 2025" min="2010" max="2099" required/>
+                  </div>
+                  <div class="form-group">
+                    <label>Jumlah Graduan *</label>
+                    <input type="number" id="smTotal" class="form-control" placeholder="cth. 1300" min="1" required/>
+                  </div>
+                </div>
+                <div class="form-row two-col">
+                  <div class="form-group">
+                    <label>Jumlah Responden *</label>
+                    <input type="number" id="smRespondents" class="form-control" placeholder="cth. 1066" min="0" required/>
+                  </div>
+                  <div class="form-group">
+                    <label>Kadar Kebolehpasaran (%) *</label>
+                    <input type="number" id="smEmploy" class="form-control" placeholder="cth. 95.1" min="0" max="100" step="0.1" required/>
+                  </div>
+                </div>
+                <div class="form-row two-col">
+                  <div class="form-group">
+                    <label>% Dalam Bidang *</label>
+                    <input type="number" id="smInField" class="form-control" placeholder="cth. 74.2" min="0" max="100" step="0.1" required/>
+                  </div>
+                  <div class="form-group">
+                    <label>Graduan Bekerja *</label>
+                    <input type="number" id="smEmployed" class="form-control" placeholder="cth. 1012" min="0" required/>
+                  </div>
+                </div>
+                <div class="form-row two-col">
+                  <div class="form-group">
+                    <label>Graduan Tidak Bekerja</label>
+                    <input type="number" id="smUnemployed" class="form-control" placeholder="cth. 40" min="0" value="0"/>
+                  </div>
+                  <div class="form-group">
+                    <label>Melanjutkan Pelajaran</label>
+                    <input type="number" id="smFurthering" class="form-control" placeholder="cth. 14" min="0" value="0"/>
+                  </div>
+                </div>
+                <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+                  <button type="submit" class="btn btn-navy">💾 Simpan Data</button>
+                  <button type="button" class="btn btn-outline-navy" onclick="resetStatsForm()">Kosongkan</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Preview / semak data semasa -->
+          <div class="card" style="margin-top:1.5rem;" id="statsPreviewCard">
+            <div class="card-header">
+              <h3>Data Statistik Semasa</h3>
+              <div style="display:flex;gap:0.5rem;align-items:center;">
+                <span class="badge warning" id="statsDataBadge">Data Asal</span>
+                <button class="btn btn-sm btn-danger" onclick="resetStatsData()" title="Pulihkan ke data contoh asal">🔄 Reset ke Asal</button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table" id="statsPreviewTable">
+                <thead>
+                  <tr>
+                    <th>Tahun</th>
+                    <th>Jumlah Graduan</th>
+                    <th>Responden</th>
+                    <th>Kadar Respons</th>
+                    <th>Kadar Kebolehpasaran</th>
+                    <th>% Dalam Bidang</th>
+                    <th>Tindakan</th>
+                  </tr>
+                </thead>
+                <tbody id="statsPreviewBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== GRADUAN: PORTAL ===== -->
+  <section class="page" id="page-graduate-portal">
+    <div class="page-header">
+      <div class="container">
+        <h1>Portal Graduan</h1>
+        <p>Akses dokumen, garis panduan, dan status soal selidik anda</p>
+      </div>
+    </div>
+    <div class="container">
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchGradTab('docs', this)">📋 Dokumen &amp; Garis Panduan</button>
+        <button class="tab-btn" onclick="switchGradTab('status', this)">🔍 Semak Status Soal Selidik</button>
+      </div>
+
+      <!-- Tab Dokumen -->
+      <div class="grad-tab active" id="gtab-docs">
+        <div class="cards-grid three-col mb-2">
+          <div class="doc-card">
+            <div class="dc-icon">📄</div>
+            <div class="dc-body">
+              <h4>Borang Soal Selidik Kajian Pengesanan Graduan</h4>
+              <p>Borang soal selidik rasmi untuk kohort 2024</p>
+              <div class="dc-meta">
+                <span class="badge navy">PDF</span>
+                <span class="text-muted">Dikemaskini: Jan 2025</span>
+              </div>
+            </div>
+            <button class="btn btn-outline-navy btn-sm dc-btn" onclick="showAlert('Muat turun dimulakan (demo).','success')">⬇ Muat Turun</button>
+          </div>
+          <div class="doc-card">
+            <div class="dc-icon">📚</div>
+            <div class="dc-body">
+              <h4>Garis Panduan &amp; Arahan Soal Selidik</h4>
+              <p>Panduan langkah demi langkah untuk melengkapkan soal selidik</p>
+              <div class="dc-meta">
+                <span class="badge navy">PDF</span>
+                <span class="text-muted">Dikemaskini: Jan 2025</span>
+              </div>
+            </div>
+            <button class="btn btn-outline-navy btn-sm dc-btn" onclick="showAlert('Muat turun dimulakan (demo).','success')">⬇ Muat Turun</button>
+          </div>
+          <div class="doc-card">
+            <div class="dc-icon">🎥</div>
+            <div class="dc-body">
+              <h4>Rakaman Taklimat — Jan 2025</h4>
+              <p>Rakaman sesi taklimat kajian pengesanan graduan</p>
+              <div class="dc-meta">
+                <span class="badge gold">Video</span>
+                <span class="text-muted">Tempoh: 45 min</span>
+              </div>
+            </div>
+            <button class="btn btn-outline-navy btn-sm dc-btn" onclick="showAlert('Membuka video (demo).','info')">▶ Tonton</button>
+          </div>
+          <div class="doc-card">
+            <div class="dc-icon">📝</div>
+            <div class="dc-body">
+              <h4>Borang Pengisytiharan Pekerjaan</h4>
+              <p>Untuk graduan mengisytiharkan status pekerjaan semasa</p>
+              <div class="dc-meta">
+                <span class="badge navy">DOCX</span>
+                <span class="text-muted">Dikemaskini: Dis 2024</span>
+              </div>
+            </div>
+            <button class="btn btn-outline-navy btn-sm dc-btn" onclick="showAlert('Muat turun dimulakan (demo).','success')">⬇ Muat Turun</button>
+          </div>
+          <div class="doc-card">
+            <div class="dc-icon">ℹ️</div>
+            <div class="dc-body">
+              <h4>Soalan Lazim MQA – Kajian Pengesanan Graduan</h4>
+              <p>Soalan yang kerap ditanya berkaitan kajian pengesanan</p>
+              <div class="dc-meta">
+                <span class="badge navy">PDF</span>
+                <span class="text-muted">Dikemaskini: Nov 2024</span>
+              </div>
+            </div>
+            <button class="btn btn-outline-navy btn-sm dc-btn" onclick="showAlert('Muat turun dimulakan (demo).','success')">⬇ Muat Turun</button>
+          </div>
+          <div class="doc-card">
+            <div class="dc-icon">🔗</div>
+            <div class="dc-body">
+              <h4>Pautan Soal Selidik Dalam Talian</h4>
+              <p>Akses portal soal selidik rasmi dalam talian</p>
+              <div class="dc-meta">
+                <span class="badge green">Aktif</span>
+                <span class="text-muted">Tarikh Akhir: 31 Mac 2025</span>
+              </div>
+            </div>
+            <button class="btn btn-navy btn-sm dc-btn" onclick="showAlert('Membuka portal soal selidik (demo).','info')">Buka Soal Selidik</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Pengumuman Penting</h3>
+          <div class="announcements">
+            <div class="ann-item">
+              <span class="ann-date">15 Jan 2025</span>
+              <div>
+                <strong>Soal Selidik Kajian Pengesanan Graduan 2024 kini DIBUKA</strong>
+                <p>Semua graduan 2024 dikehendaki melengkapkan soal selidik menjelang 31 Mac 2025.</p>
+              </div>
+              <span class="badge green">Baru</span>
+            </div>
+            <div class="ann-item">
+              <span class="ann-date">10 Dis 2024</span>
+              <div>
+                <strong>Rakaman Sesi Taklimat Soal Selidik Tersedia</strong>
+                <p>Rakaman sesi taklimat Disember kini boleh dimuat turun.</p>
+              </div>
+            </div>
+            <div class="ann-item">
+              <span class="ann-date">01 Dis 2024</span>
+              <div>
+                <strong>Borang Pengisytiharan Pekerjaan Dikemaskini</strong>
+                <p>Sila gunakan borang terkini (Versi 3.0) untuk semua pengisytiharan pekerjaan.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Semak Status -->
+      <div class="grad-tab" id="gtab-status">
+        <div class="two-col-grid">
+          <div class="card">
+            <h3 class="card-title">Semak Status Soal Selidik Anda</h3>
+            <p class="text-muted">Masukkan maklumat anda di bawah untuk mengesahkan status penyiapan soal selidik.</p>
+            <form class="form" onsubmit="checkGradStatus(event)">
+              <div class="form-group">
+                <label>ID Pelajar / Graduan *</label>
+                <input type="text" id="gradCheckId" class="form-control" placeholder="cth. PB2024-001" required/>
+              </div>
+              <div class="form-group">
+                <label>Nama Penuh (seperti dalam IC) *</label>
+                <input type="text" id="gradCheckName" class="form-control" placeholder="Masukkan nama penuh anda" required/>
+              </div>
+              <div class="form-group">
+                <label>Nombor IC / Pasport *</label>
+                <input type="text" id="gradCheckIc" class="form-control" placeholder="Masukkan No. IC atau Pasport" required/>
+              </div>
+              <div class="form-group">
+                <label>Tahun Graduasi *</label>
+                <select id="gradCheckYear" class="form-control" required>
+                  <option value="">Pilih tahun</option>
+                  <option value="2024">2024</option>
+                  <option value="2023">2023</option>
+                  <option value="2022">2022</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-navy btn-full">Semak Status</button>
+            </form>
+          </div>
+          <div>
+            <div class="card" id="gradStatusResult" style="display:none">
+              <h3 class="card-title">Keputusan Status</h3>
+              <div id="gradStatusContent"></div>
+            </div>
+            <div class="card">
+              <h3 class="card-title">Panduan Status</h3>
+              <div class="status-guide">
+                <div class="sg-item">
+                  <span class="badge green">Selesai</span>
+                  <p>Soal selidik anda telah diterima dan disahkan.</p>
+                </div>
+                <div class="sg-item">
+                  <span class="badge warning">Menunggu</span>
+                  <p>Soal selidik telah diserahkan tetapi menunggu pengesahan.</p>
+                </div>
+                <div class="sg-item">
+                  <span class="badge danger">Belum Diserah</span>
+                  <p>Tiada penyerahan soal selidik ditemui. Sila lengkapkan soal selidik.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PENASIHAT: LOG MASUK ===== -->
+  <section class="page" id="page-advisor-login">
+    <div class="auth-wrapper">
+      <div class="auth-card">
+        <div class="auth-header">
+          <div class="auth-logo">👨‍🏫</div>
+          <h2>Log Masuk Penasihat Akademik</h2>
+          <p>Penasihat yang diberi kuasa sahaja</p>
+        </div>
+        <div class="alert alert-info">
+          <strong>Kelayakan Demo:</strong><br/>
+          Penasihat: <code>advisor</code> / <code>adv123</code>
+        </div>
+        <form class="form" onsubmit="advisorLogin(event)">
+          <div class="form-group">
+            <label>ID Penasihat / Nama Pengguna</label>
+            <input type="text" id="advUsername" class="form-control" placeholder="Masukkan nama pengguna" required />
+          </div>
+          <div class="form-group">
+            <label>Kata Laluan</label>
+            <input type="password" id="advPassword" class="form-control" placeholder="Masukkan kata laluan" required />
+          </div>
+          <div id="advLoginError" class="alert alert-danger" style="display:none">Kelayakan tidak sah.</div>
+          <button type="submit" class="btn btn-navy btn-full">Log Masuk</button>
+        </form>
+        <div class="auth-footer">
+          <a href="#" onclick="showPage('home')">← Kembali ke Utama</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PENASIHAT: PAPAN PEMUKA ===== -->
+  <section class="page" id="page-advisor-dashboard">
+    <div class="page-header">
+      <div class="container">
+        <div class="ph-row">
+          <div>
+            <h1>Portal Penasihat Akademik</h1>
+            <p id="advWelcome">Selamat Datang, Penasihat Akademik</p>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="logout()">Log Keluar</button>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <!-- Notis kebenaran -->
+      <div class="card mb-2 perm-card">
+        <div class="perm-row">
+          <span class="perm-icon">🔐</span>
+          <div>
+            <strong>Tahap Akses Anda:</strong> Lihat Sahaja — Anda boleh mencari dan melihat status penyiapan soal selidik untuk pelajar di bawah seliaan anda.
+          </div>
+        </div>
+      </div>
+
+      <!-- Borang carian -->
+      <div class="card mb-2">
+        <h3 class="card-title">Cari Status Soal Selidik Pelajar</h3>
+        <form class="form form-inline" onsubmit="advisorSearch(event)">
+          <div class="form-row four-col">
+            <div class="form-group">
+              <label>ID Pelajar</label>
+              <input type="text" id="advSearchId" class="form-control" placeholder="cth. PB2024-001"/>
+            </div>
+            <div class="form-group">
+              <label>Nama Pelajar</label>
+              <input type="text" id="advSearchName" class="form-control" placeholder="Masukkan nama..."/>
+            </div>
+            <div class="form-group">
+              <label>Program</label>
+              <select id="advSearchProg" class="form-control">
+                <option value="">Semua Program</option>
+                <option>Diploma in IT</option>
+                <option>Diploma in Engineering</option>
+                <option>Diploma in Business</option>
+                <option>Diploma in Nursing</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Tahun</label>
+              <select id="advSearchYear" class="form-control">
+                <option value="">Semua Tahun</option>
+                <option>2024</option>
+                <option>2023</option>
+                <option>2022</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-navy">Cari</button>
+        </form>
+      </div>
+
+      <!-- Keputusan -->
+      <div class="card" id="advResultsCard">
+        <div class="card-header">
+          <h3>Keputusan Carian</h3>
+          <span class="text-muted" id="advResultCount">Masukkan kriteria carian di atas</span>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID Pelajar</th>
+                <th>Nama</th>
+                <th>Program</th>
+                <th>Tahun</th>
+                <th>Status Soal Selidik</th>
+                <th>Tarikh Siap</th>
+                <th>Catatan</th>
+              </tr>
+            </thead>
+            <tbody id="advResultsBody">
+              <tr><td colspan="7" class="text-center text-muted">Tiada keputusan lagi. Gunakan borang carian di atas.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ========== TOAST GLOBAL ========== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ========== MODAL EDIT REKOD ========== -->
+<div class="modal-overlay" id="editModal" style="display:none">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Edit Rekod Graduan</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <form class="form" onsubmit="saveRecord(event)">
+      <input type="hidden" id="editRecordId"/>
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label>ID Graduan</label>
+          <input type="text" id="editGradId" class="form-control" readonly/>
+        </div>
+        <div class="form-group">
+          <label>Nama Penuh</label>
+          <input type="text" id="editName" class="form-control" required/>
+        </div>
+      </div>
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label>Program</label>
+          <input type="text" id="editProg" class="form-control"/>
+        </div>
+        <div class="form-group">
+          <label>Tahun</label>
+          <select id="editYear" class="form-control">
+            <option>2024</option><option>2023</option><option>2022</option><option>2021</option><option>2020</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label>Status Soal Selidik</label>
+          <select id="editSurveyStatus" class="form-control">
+            <option>Completed</option><option>Pending</option><option>Not Submitted</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status Pekerjaan</label>
+          <select id="editEmployStatus" class="form-control">
+            <option>Employed</option><option>Unemployed</option><option>Furthering Studies</option><option>Self-Employed</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Bekerja Dalam Bidang?</label>
+        <select id="editInField" class="form-control">
+          <option value="Yes">Ya</option>
+          <option value="No">Tidak</option>
+          <option value="N/A">T/B</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-navy" onclick="closeModal()">Batal</button>
+        <button type="submit" class="btn btn-navy">Simpan Perubahan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner container">
+    <div class="footer-brand">
+      <strong>SKPG@PBU</strong>
+      <span class="footer-divider">|</span>
+      <span>Politeknik Balik Pulau</span>
+    </div>
+    <div class="footer-copy">
+      © SKPG@PBU. Untuk kegunaan rasmi sahaja.
+    </div>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
